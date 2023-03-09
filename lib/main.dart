@@ -4,20 +4,23 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:redux/redux.dart';
 import 'package:test_redux/features/auth/models/login_model.dart';
 
+import 'app_redux/app_middleware.dart';
+import 'app_redux/app_reducer.dart';
+import 'app_redux/app_state.dart';
 import 'features/auth/redux/auth_actions.dart';
 import 'features/connectivity/redux/connectivity_actions.dart';
-import 'redux/app_middleware.dart';
-import 'redux/app_reducer.dart';
-import 'redux/app_state.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Declaring store
   final store = Store<AppState>(
     appReducer,
     initialState: const AppState(),
     middleware: appMiddleware,
   );
 
+  //#region internet connection check and status change by redux
   final customInstance = InternetConnectionChecker.createInstance(
     checkTimeout: const Duration(seconds: 1), // Custom check timeout
     checkInterval: const Duration(seconds: 1), // Custom check interval
@@ -29,15 +32,16 @@ void main() {
       bool result = await InternetConnectionChecker().hasConnection;
       debugPrint('InternetConnectionChecker result: $result');
 
-      if (result) {
+      if (result && !store.state.isInternetConnected) {
         store.dispatch(IsConnectedAction());
         debugPrint('Connect dispatched');
-      } else {
+      } else if (!result && store.state.isInternetConnected) {
         store.dispatch(IsDisconnectedAction());
         debugPrint('Disconnect dispatched');
       }
     },
   );
+  //#endregion
 
   runApp(MyApp(store));
 }

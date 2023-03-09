@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:test_redux/features/auth/redux/auth_actions.dart';
 
-import '../../../redux/app_state.dart';
+import '../../../app_redux/app_state.dart';
 import '../repositories/auth_repository.dart';
 
 List<Middleware<AppState>> createAuthsMiddleware(
